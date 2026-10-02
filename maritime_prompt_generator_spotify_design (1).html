@@ -1,0 +1,1225 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>차세대 해양 무기체계 프롬프트 생성기 · Spotify-inspired UI</title>
+  <style>
+
+    :root{
+      --bg:#121212;
+      --surface:#181818;
+      --surface-2:#1f1f1f;
+      --surface-3:#252525;
+      --surface-4:#272727;
+      --text:#ffffff;
+      --text-soft:#cbcbcb;
+      --muted:#b3b3b3;
+      --border:#4d4d4d;
+      --border-light:#7c7c7c;
+      --accent:#1ed760;
+      --accent-dark:#1db954;
+      --danger:#f3727f;
+      --warn:#ffa42b;
+      --info:#539df5;
+      --shadow-heavy:0 8px 24px rgba(0,0,0,.5);
+      --shadow-medium:0 8px 8px rgba(0,0,0,.3);
+      --input-inset:rgb(18,18,18) 0 1px 0, rgb(124,124,124) 0 0 0 1px inset;
+      --radius:8px;
+      --pill:9999px;
+    }
+
+    *{box-sizing:border-box}
+
+    html{
+      background:var(--bg);
+      color-scheme:dark;
+      scroll-behavior:smooth;
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:
+        SpotifyMixUI,
+        "CircularSp",
+        "Pretendard",
+        "Noto Sans KR",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
+        "Hiragino Sans",
+        "Hiragino Kaku Gothic ProN",
+        Meiryo,
+        sans-serif;
+      background:
+        radial-gradient(circle at 78% -10%, rgba(30,215,96,.08), transparent 24rem),
+        linear-gradient(180deg,#0f0f0f 0%, var(--bg) 20%, var(--bg) 100%);
+      color:var(--text);
+      font-size:14px;
+      line-height:1.42;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
+    button,input,textarea,select{font:inherit}
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:rgba(18,18,18,.94);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(255,255,255,.05);
+      box-shadow:0 4px 20px rgba(0,0,0,.22);
+    }
+
+    .wrap{
+      max-width:1440px;
+      margin:0 auto;
+      padding:16px 20px;
+    }
+
+    .title-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    h1{
+      margin:0 0 5px;
+      font-family:
+        SpotifyMixUITitle,
+        "CircularSp",
+        "Pretendard",
+        "Noto Sans KR",
+        system-ui,
+        sans-serif;
+      font-size:24px;
+      line-height:1.15;
+      font-weight:700;
+      letter-spacing:-.35px;
+    }
+
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:400;
+    }
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border:0;
+      border-radius:var(--pill);
+      color:#0a0a0a;
+      background:var(--accent);
+      font-size:11px;
+      line-height:1;
+      font-weight:700;
+      letter-spacing:1.2px;
+      text-transform:uppercase;
+      white-space:nowrap;
+      box-shadow:0 8px 20px rgba(30,215,96,.14);
+    }
+
+    .status-pill::before{
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:#0a0a0a;
+      opacity:.9;
+    }
+
+    main{
+      display:grid;
+      grid-template-columns:minmax(0,1.08fr) minmax(420px,.92fr);
+      gap:16px;
+      align-items:start;
+      padding-top:8px;
+    }
+
+    main > .panel:last-child{
+      position:sticky;
+      top:92px;
+      max-height:calc(100vh - 112px);
+      overflow:auto;
+      scrollbar-color:#535353 transparent;
+      scrollbar-width:thin;
+    }
+
+    .panel{
+      background:var(--surface);
+      border:0;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-medium);
+      overflow:hidden;
+    }
+
+    .panel:hover{
+      background:#1a1a1a;
+    }
+
+    .panel-head{
+      padding:16px 18px;
+      border-bottom:1px solid rgba(255,255,255,.055);
+      background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .panel-head h2{
+      margin:0;
+      font-family:
+        SpotifyMixUITitle,
+        "CircularSp",
+        "Pretendard",
+        system-ui,
+        sans-serif;
+      font-size:18px;
+      line-height:1.25;
+      font-weight:700;
+      letter-spacing:-.15px;
+    }
+
+    .panel-body{
+      padding:16px 18px 18px;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    label.field{display:block}
+
+    .field > span{
+      display:block;
+      color:var(--text-soft);
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:7px;
+    }
+
+    input[type="text"],
+    textarea,
+    select{
+      width:100%;
+      color:var(--text);
+      background:var(--surface-2);
+      border:0;
+      border-radius:500px;
+      padding:11px 14px;
+      outline:none;
+      box-shadow:var(--input-inset);
+      transition:
+        background .15s ease,
+        box-shadow .15s ease,
+        transform .15s ease;
+    }
+
+    textarea{
+      min-height:94px;
+      resize:vertical;
+      border-radius:8px;
+      line-height:1.52;
+    }
+
+    select{
+      cursor:pointer;
+      color-scheme:dark;
+    }
+
+    input[type="text"]:hover,
+    textarea:hover,
+    select:hover{
+      background:#242424;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus{
+      box-shadow:
+        rgb(18,18,18) 0 1px 0,
+        rgb(255,255,255) 0 0 0 2px inset;
+      background:#242424;
+    }
+
+    .section{
+      margin-top:14px;
+      padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+
+    .section:first-child{
+      margin-top:0;
+      padding-top:0;
+      border-top:0;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:9px;
+    }
+
+    .section-title h3{
+      margin:0;
+      font-size:14px;
+      line-height:1.25;
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .section-title small{
+      color:var(--muted);
+      font-size:11px;
+      font-weight:400;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      min-height:34px;
+      padding:7px 11px;
+      border:0;
+      border-radius:var(--pill);
+      background:var(--surface-2);
+      color:var(--muted);
+      cursor:pointer;
+      user-select:none;
+      font-size:12px;
+      font-weight:600;
+      box-shadow:rgb(124,124,124) 0 0 0 1px inset;
+      transition:
+        transform .15s ease,
+        background .15s ease,
+        color .15s ease,
+        box-shadow .15s ease;
+    }
+
+    .chip:hover{
+      color:var(--text);
+      background:#292929;
+      transform:scale(1.015);
+      box-shadow:rgb(255,255,255) 0 0 0 1px inset;
+    }
+
+    .chip input{
+      accent-color:var(--accent);
+      width:14px;
+      height:14px;
+      margin:0;
+    }
+
+    .chip:has(input:checked){
+      background:#fff;
+      color:#121212;
+      box-shadow:none;
+    }
+
+    .chip:has(input:checked) input{
+      accent-color:#121212;
+    }
+
+    .toolbar,
+    .preset-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    button{
+      min-height:36px;
+      border:0;
+      background:var(--surface-2);
+      color:var(--text);
+      border-radius:var(--pill);
+      padding:9px 15px;
+      cursor:pointer;
+      font-size:11px;
+      line-height:1;
+      font-weight:700;
+      letter-spacing:1.3px;
+      text-transform:uppercase;
+      box-shadow:rgb(124,124,124) 0 0 0 1px inset;
+      transition:
+        transform .15s ease,
+        background .15s ease,
+        color .15s ease,
+        opacity .15s ease,
+        box-shadow .15s ease;
+    }
+
+    button:hover{
+      transform:scale(1.035);
+      background:#2a2a2a;
+      box-shadow:rgb(255,255,255) 0 0 0 1px inset;
+    }
+
+    button:active{
+      transform:scale(.985);
+      opacity:.82;
+    }
+
+    button.primary{
+      background:var(--accent);
+      color:#000;
+      box-shadow:none;
+    }
+
+    button.primary:hover{
+      background:#3be477;
+      color:#000;
+      box-shadow:0 8px 18px rgba(30,215,96,.16);
+    }
+
+    button.good{
+      background:#fff;
+      color:#121212;
+      box-shadow:none;
+    }
+
+    button.good:hover{
+      background:#f0f0f0;
+      color:#121212;
+    }
+
+    button.warn{
+      background:var(--surface-2);
+      color:var(--warn);
+      box-shadow:rgba(255,164,43,.48) 0 0 0 1px inset;
+    }
+
+    button.warn:hover{
+      background:#2a241b;
+      box-shadow:var(--warn) 0 0 0 1px inset;
+    }
+
+    button.danger{
+      background:var(--surface-2);
+      color:var(--danger);
+      box-shadow:rgba(243,114,127,.5) 0 0 0 1px inset;
+    }
+
+    button.danger:hover{
+      background:#2a1b1e;
+      box-shadow:var(--danger) 0 0 0 1px inset;
+    }
+
+    .result-box{
+      width:100%;
+      min-height:680px;
+      padding:14px;
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+      line-height:1.56;
+      font-size:12.5px;
+      white-space:pre-wrap;
+      background:#101010;
+      color:#f5f5f5;
+      border-radius:8px;
+      box-shadow:
+        rgb(18,18,18) 0 1px 0,
+        rgb(76,76,76) 0 0 0 1px inset;
+    }
+
+    .result-box:focus{
+      box-shadow:
+        rgb(18,18,18) 0 1px 0,
+        rgb(255,255,255) 0 0 0 2px inset;
+    }
+
+    .footer-note{
+      margin:10px 0 0;
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.5;
+    }
+
+    .metric{
+      color:var(--muted);
+      font-size:11px;
+      text-align:right;
+      margin-top:8px;
+    }
+
+    .divider{
+      height:1px;
+      background:rgba(255,255,255,.06);
+      margin:14px 0;
+    }
+
+    .inline-check{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:var(--text-soft);
+      font-size:12px;
+      font-weight:600;
+    }
+
+    .inline-check input{
+      accent-color:var(--accent);
+    }
+
+    .advanced{display:none}
+    .advanced.show{display:block}
+
+    .help{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.5;
+      margin-top:6px;
+    }
+
+    .tagline{
+      padding:10px 12px;
+      background:var(--surface-2);
+      border:0;
+      border-radius:8px;
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.45;
+      box-shadow:rgb(76,76,76) 0 0 0 1px inset;
+    }
+
+    /* Spotify-like functional emphasis:
+       green is reserved for primary/active states rather than decoration. */
+    input[type="checkbox"]{
+      cursor:pointer;
+    }
+
+    ::selection{
+      background:var(--accent);
+      color:#000;
+    }
+
+    ::-webkit-scrollbar{
+      width:10px;
+      height:10px;
+    }
+
+    ::-webkit-scrollbar-track{
+      background:transparent;
+    }
+
+    ::-webkit-scrollbar-thumb{
+      background:#4b4b4b;
+      border:3px solid transparent;
+      background-clip:padding-box;
+      border-radius:999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover{
+      background:#666;
+      border:3px solid transparent;
+      background-clip:padding-box;
+    }
+
+    @media (max-width:1020px){
+      main{
+        grid-template-columns:1fr;
+      }
+      main > .panel:last-child{
+        position:static;
+        max-height:none;
+        overflow:visible;
+      }
+      header{
+        position:static;
+      }
+      .result-box{
+        min-height:520px;
+      }
+    }
+
+    @media (max-width:700px){
+      .wrap{
+        padding:12px;
+      }
+      .title-row{
+        align-items:flex-start;
+      }
+      .status-pill{
+        display:none;
+      }
+      h1{
+        font-size:21px;
+      }
+      .grid-2{
+        grid-template-columns:1fr;
+      }
+      .panel-head{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+      .panel-head .toolbar{
+        width:100%;
+      }
+      .panel-head .toolbar button{
+        flex:1 1 auto;
+      }
+      button{
+        letter-spacing:1px;
+      }
+      .result-box{
+        min-height:460px;
+      }
+    }
+
+    @media (max-width:425px){
+      .wrap{
+        padding:10px;
+      }
+      .panel-head,
+      .panel-body{
+        padding-left:14px;
+        padding-right:14px;
+      }
+      .chip{
+        font-size:11px;
+        min-height:32px;
+      }
+      .preset-row button,
+      .toolbar button{
+        flex:1 1 calc(50% - 8px);
+      }
+      .result-box{
+        min-height:420px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap title-row">
+    <div>
+      <h1>차세대 해양 무기체계 프롬프트 생성기</h1>
+      <p class="subtitle">SE 관점의 System-of-Systems 이미지 프롬프트 자동 조합 도구</p>
+    </div>
+    <div class="status-pill">HTML + JavaScript · 단일 파일</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>1. 구성 요소 선택</h2>
+        <div class="toolbar">
+          <button id="btnAll">핵심 전체 선택</button>
+          <button id="btnClear" class="danger">초기화</button>
+        </div>
+      </div>
+      <div class="panel-body">
+
+        <div class="section">
+          <div class="grid-2">
+            <label class="field">
+              <span>발표 / 이미지 제목</span>
+              <input id="title" type="text" value="차세대 해양 유·무인 복합전투체계" />
+            </label>
+            <label class="field">
+              <span>이미지 목적</span>
+              <select id="purpose">
+                <option value="presentation">발표용 시스템 개념도</option>
+                <option value="cover">발표 표지 이미지</option>
+                <option value="architecture">시스템 아키텍처 설명</option>
+                <option value="photoreal">실사형 기술 시연 이미지</option>
+              </select>
+            </label>
+          </div>
+          <div class="tagline">권장 흐름: Sensor → Network → AI Sensor Fusion → CMS → Autonomous Mission → Platform</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>플랫폼</h3><small>Platform</small></div>
+          <div class="chips" data-group="platform">
+            <label class="chip"><input type="checkbox" value="대형 해양 플랫폼 / 무인체계 모함" checked> 대형 해양 플랫폼</label>
+            <label class="chip"><input type="checkbox" value="유인 잠수함" checked> 유인 잠수함</label>
+            <label class="chip"><input type="checkbox" value="XLUUV(초대형 무인잠수정)" checked> XLUUV</label>
+            <label class="chip"><input type="checkbox" value="USV 군집" checked> USV 군집</label>
+            <label class="chip"><input type="checkbox" value="UUV 군집" checked> UUV 군집</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>센서</h3><small>Sensor</small></div>
+          <div class="chips" data-group="sensor">
+            <label class="chip"><input type="checkbox" value="소형 해군용 AESA 레이더" checked> Compact AESA</label>
+            <label class="chip"><input type="checkbox" value="EO/IR 센서" checked> EO/IR</label>
+            <label class="chip"><input type="checkbox" value="ESM / RF 센서" checked> ESM/RF</label>
+            <label class="chip"><input type="checkbox" value="소나 및 수중 음향센서" checked> Sonar</label>
+            <label class="chip"><input type="checkbox" value="분산형 레이더 / Cooperative Radar"> Distributed Radar</label>
+            <label class="chip"><input type="checkbox" value="Multistatic / MIMO Radar"> Multistatic/MIMO</label>
+            <label class="chip"><input type="checkbox" value="Cognitive Radar"> Cognitive Radar</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>네트워크 / 통신</h3><small>Network</small></div>
+          <div class="chips" data-group="network">
+            <label class="chip"><input type="checkbox" value="Line-of-Sight Data Link" checked> LOS Data Link</label>
+            <label class="chip"><input type="checkbox" value="Maritime Mesh Network" checked> Maritime Mesh</label>
+            <label class="chip"><input type="checkbox" value="SATCOM" checked> SATCOM</label>
+            <label class="chip"><input type="checkbox" value="Underwater Acoustic Communication" checked> 수중 음향통신</label>
+            <label class="chip"><input type="checkbox" value="Surface/Subsurface Network"> 수상/수중 통합망</label>
+            <label class="chip"><input type="checkbox" value="Tactical Edge Network"> Tactical Edge</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>AI / C2 / 자율화</h3><small>Intelligence & Control</small></div>
+          <div class="chips" data-group="ai">
+            <label class="chip"><input type="checkbox" value="AI Sensor Fusion" checked> AI Sensor Fusion</label>
+            <label class="chip"><input type="checkbox" value="Common Operational Picture" checked> COP</label>
+            <label class="chip"><input type="checkbox" value="Combat Management System(CMS)" checked> CMS</label>
+            <label class="chip"><input type="checkbox" value="Autonomous Mission Management" checked> 자율 임무관리</label>
+            <label class="chip"><input type="checkbox" value="Cooperative Autonomy" checked> Cooperative Autonomy</label>
+            <label class="chip"><input type="checkbox" value="Multi-Agent Coordination"> Multi-Agent</label>
+            <label class="chip"><input type="checkbox" value="AI-Assisted Decision Support"> AI 의사결정 지원</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>레이더 임무</h3><small>Radar Mission</small></div>
+          <div class="chips" data-group="radar">
+            <label class="chip"><input type="checkbox" value="해상 표적 탐지" checked> 해상 표적</label>
+            <label class="chip"><input type="checkbox" value="저고도 공중 표적 탐지" checked> 저고도 표적</label>
+            <label class="chip"><input type="checkbox" value="소형 RCS 표적 탐지" checked> Small RCS</label>
+            <label class="chip"><input type="checkbox" value="Sea Clutter Suppression" checked> Sea Clutter</label>
+            <label class="chip"><input type="checkbox" value="Low-Flying UAV Detection"> UAV 탐지</label>
+            <label class="chip"><input type="checkbox" value="Cooperative Detection and Tracking"> 협동 탐지/추적</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>SE 강조 요소</h3><small>Systems Engineering</small></div>
+          <div class="chips" data-group="se">
+            <label class="chip"><input type="checkbox" value="System-of-Systems" checked> System-of-Systems</label>
+            <label class="chip"><input type="checkbox" value="시스템 아키텍처" checked> Architecture</label>
+            <label class="chip"><input type="checkbox" value="서브시스템 인터페이스" checked> Interface</label>
+            <label class="chip"><input type="checkbox" value="System Integration" checked> Integration</label>
+            <label class="chip"><input type="checkbox" value="Requirements Engineering"> Requirements</label>
+            <label class="chip"><input type="checkbox" value="Verification & Validation"> V&V</label>
+            <label class="chip"><input type="checkbox" value="Modular / Open Architecture"> Modular/Open</label>
+            <label class="chip"><input type="checkbox" value="Interoperability"> Interoperability</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>정보 흐름</h3><small>Data / Mission Flow</small></div>
+          <div class="chips" data-group="flow">
+            <label class="chip"><input type="checkbox" value="Sensor Data Flow" checked> Sensor Data</label>
+            <label class="chip"><input type="checkbox" value="Command and Control Flow" checked> C2 Flow</label>
+            <label class="chip"><input type="checkbox" value="Mission Data Exchange" checked> Mission Data</label>
+            <label class="chip"><input type="checkbox" value="Peer-to-Peer Communication"> P2P</label>
+            <label class="chip"><input type="checkbox" value="Real-Time Data Sharing"> Real-Time Sharing</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><h3>시각 스타일</h3><small>Visual Style</small></div>
+          <div class="chips" data-group="style">
+            <label class="chip"><input type="checkbox" value="Physically Plausible" checked> 물리적 개연성</label>
+            <label class="chip"><input type="checkbox" value="Operationally Credible" checked> 운용 개연성</label>
+            <label class="chip"><input type="checkbox" value="Realistic Naval Engineering" checked> 현실적 해군 공학</label>
+            <label class="chip"><input type="checkbox" value="Engineering Documentary Style" checked> 기술 다큐 스타일</label>
+            <label class="chip"><input type="checkbox" value="Restrained Technical Visualization" checked> 절제된 기술 시각화</label>
+            <label class="chip"><input type="checkbox" value="Physically Based Rendering"> PBR</label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="grid-2">
+            <label class="field">
+              <span>USV 수량</span>
+              <select id="usvCount">
+                <option>4~6대</option>
+                <option selected>6~8대</option>
+                <option>8~12대</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>UUV 수량</span>
+              <select id="uuvCount">
+                <option>4~6대</option>
+                <option selected>6~10대</option>
+                <option>10~16대</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">
+            <h3>빠른 프리셋</h3>
+            <small>Preset</small>
+          </div>
+          <div class="preset-row">
+            <button data-preset="balanced">SE 균형형</button>
+            <button data-preset="radar">레이더 중심</button>
+            <button data-preset="autonomy">AI·군집 중심</button>
+            <button data-preset="underwater">잠수함·XLUUV 중심</button>
+            <button data-preset="cover">표지형</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <button id="toggleAdvanced">고급 옵션 열기</button>
+          <div id="advanced" class="advanced">
+            <div class="divider"></div>
+            <div class="grid-2">
+              <label class="field">
+                <span>화면 구성</span>
+                <select id="composition">
+                  <option value="split" selected>수상 45% / 수중 55% 반단면</option>
+                  <option value="surface">수상 중심</option>
+                  <option value="underwater">수중 중심</option>
+                  <option value="diagram">아키텍처 다이어그램 중심</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>HUD 강도</span>
+                <select id="hud">
+                  <option value="minimal" selected>최소</option>
+                  <option value="medium">중간</option>
+                  <option value="none">없음</option>
+                </select>
+              </label>
+            </div>
+            <div class="grid-2" style="margin-top:14px">
+              <label class="field">
+                <span>추가 요구사항</span>
+                <textarea id="extra" placeholder="예: 제목 공간을 좌측 상단에 확보, XLUUV를 더 강조"></textarea>
+              </label>
+              <label class="field">
+                <span>추가 제외 요소</span>
+                <textarea id="extraNegative" placeholder="예: 과도한 무장, 특정 국가 표식, 인물"></textarea>
+              </label>
+            </div>
+            <div style="margin-top:12px">
+              <label class="inline-check"><input id="includeEnglishTerms" type="checkbox" checked> 핵심 영문 기술용어 병기</label>
+              <label class="inline-check" style="margin-top:8px"><input id="includeArchitecture" type="checkbox" checked> Sensor → Network → AI → CMS → Mission 계층 구조 포함</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>2. 생성된 프롬프트</h2>
+        <div class="toolbar">
+          <button id="btnGenerate" class="primary">프롬프트 생성</button>
+          <button id="btnCopy" class="good">복사</button>
+          <button id="btnDownload" class="warn">TXT 저장</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <textarea id="result" class="result-box" spellcheck="false"></textarea>
+        <div id="metric" class="metric"></div>
+        <p class="footer-note">
+          이 도구는 이미지 생성 프롬프트 조합용입니다. 특정 실무·작전 절차나 운용 파라미터를 자동 생성하지 않고,
+          시스템 구성·아키텍처·시각적 표현 중심으로 문장을 구성합니다.
+        </p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+function values(group){
+  return $$(`[data-group="${group}"] input:checked`).map(x => x.value);
+}
+function has(group, valuePart){
+  return values(group).some(v => v.includes(valuePart));
+}
+function joinKo(arr){
+  if(arr.length === 0) return "";
+  if(arr.length === 1) return arr[0];
+  return arr.slice(0,-1).join(", ") + " 및 " + arr.at(-1);
+}
+function listBlock(arr){
+  return arr.length ? arr.map(x => `- ${x}`).join("\n") : "- 선택 없음";
+}
+
+function purposeText(purpose){
+  return {
+    presentation:"발표용 고급 시스템 엔지니어링 컨셉 이미지",
+    cover:"전문적인 방산 기술 발표자료 표지 이미지",
+    architecture:"시스템 아키텍처 설명용 기술 인포그래픽",
+    photoreal:"실제 해군 기술시연 현장을 연상시키는 실사형 기술 시각화"
+  }[purpose];
+}
+
+function compositionText(v){
+  return {
+    split:"16:9 수상/수중 반단면 구도. 수상 약 45%, 수중 약 55% 비율.",
+    surface:"16:9 수상 중심 구도. 대형 해양 플랫폼과 USV 군집, 센서 네트워크를 중심으로 구성.",
+    underwater:"16:9 수중 중심 구도. 유인 잠수함, XLUUV, UUV 군집과 수중 통신망을 중심으로 구성.",
+    diagram:"16:9 시스템 아키텍처 중심 구도. 플랫폼보다 계층 구조와 인터페이스, 데이터 흐름을 우선 표현."
+  }[v];
+}
+
+function hudText(v){
+  return {
+    minimal:"HUD와 네트워크 연결선은 최소화하고, 후처리 기술 그래픽처럼 절제되게 표현한다.",
+    medium:"필요한 센서 범위, 링크, 정보 흐름은 명확히 보이도록 하되 과도한 홀로그램 표현은 피한다.",
+    none:"HUD를 거의 사용하지 않고 플랫폼과 시스템 연결을 현실적인 장면 및 간결한 선으로만 표현한다."
+  }[v];
+}
+
+function generatePrompt(){
+  const title = $("#title").value.trim() || "차세대 해양 유·무인 복합전투체계";
+  const purpose = $("#purpose").value;
+  const platforms = values("platform");
+  const sensors = values("sensor");
+  const networks = values("network");
+  const ai = values("ai");
+  const radar = values("radar");
+  const se = values("se");
+  const flows = values("flow");
+  const styles = values("style");
+  const usvCount = $("#usvCount").value;
+  const uuvCount = $("#uuvCount").value;
+  const composition = $("#composition").value;
+  const hud = $("#hud").value;
+  const extra = $("#extra").value.trim();
+  const extraNegative = $("#extraNegative").value.trim();
+  const includeEnglish = $("#includeEnglishTerms").checked;
+  const includeArchitecture = $("#includeArchitecture").checked;
+
+  const englishNote = includeEnglish
+    ? "핵심 기술용어는 필요한 경우 한글과 영문을 함께 병기한다."
+    : "이미지 내 표현은 가급적 한글 중심으로 구성한다.";
+
+  let prompt = `# 이미지 생성 프롬프트
+
+주제: ${title}
+
+${purposeText(purpose)}를 생성한다.
+
+핵심 목표는 단순히 미래형 해양 무기체계를 화려하게 묘사하는 것이 아니라,
+시스템 엔지니어링(SE) 관점에서 플랫폼, 센서, 통신 네트워크, AI 센서융합,
+전투관리체계(CMS), 자율 임무관리 및 유·무인 플랫폼이 하나의 System-of-Systems로
+통합되는 구조를 명확하게 시각화하는 것이다.
+
+## 1. 전체 구도
+
+${compositionText(composition)}
+
+선택 플랫폼:
+${listBlock(platforms)}
+
+`;
+
+  if(platforms.some(x => x.includes("대형 해양 플랫폼"))){
+    prompt += `수상 영역에는 대형 해양 플랫폼 또는 무인체계 모함을 핵심 노드로 배치한다.
+해당 플랫폼은 SF 우주선이 아니라 현대 해군 지원함 또는 임무지원함의 설계 언어를 기반으로,
+실재 가능하고 운용적으로 설득력 있는 형태로 표현한다.
+
+`;
+  }
+
+  if(platforms.some(x => x.includes("USV"))){
+    prompt += `대형 플랫폼 주변에는 ${usvCount}의 USV를 분산 군집 형태로 배치한다.
+USV는 저피탐형·저상형 선체, 안정화 센서 마스트, 데이터링크 안테나를 갖춘 현실적인 무인수상정으로 표현한다.
+`;
+    if(has("sensor","AESA")){
+      prompt += `각 USV의 핵심 센서로 소형 해군용 AESA 레이더를 탑재하고, 레이더 탐지 범위는 반투명한 기술 그래픽으로 절제되게 표현한다.
+`;
+    }
+    prompt += "\n";
+  }
+
+  if(platforms.some(x => x.includes("잠수함")) || platforms.some(x => x.includes("XLUUV")) || platforms.some(x => x.includes("UUV"))){
+    prompt += `수중 영역에는 선택된 수중 플랫폼을 실제 해군 공학에 부합하는 유체역학적 형상으로 배치한다.
+`;
+  }
+  if(platforms.some(x => x.includes("XLUUV"))){
+    prompt += `XLUUV는 긴 원통형 유체역학 선체, 모듈형 임무 탑재부, 제어핀 및 현실적인 추진계 구성을 갖춘다.
+`;
+  }
+  if(platforms.some(x => x.includes("UUV"))){
+    prompt += `UUV는 약 ${uuvCount} 규모의 협동 군집으로 표현하며, 감시·정찰·수중 센싱을 분산 수행하는 모습으로 구성한다.
+`;
+  }
+
+  prompt += `
+## 2. 센서 체계
+
+선택 센서:
+${listBlock(sensors)}
+
+센서들은 단독 장비처럼 보이기보다 각 플랫폼과 통합된 서브시스템으로 표현한다.
+레이더, EO/IR, ESM, 소나 등 이기종 센서 정보가 AI Sensor Fusion으로 수렴하는 구조를 표현한다.
+`;
+
+  if(radar.length){
+    prompt += `
+레이더 관련 표현 목표:
+${listBlock(radar)}
+`;
+  }
+
+  if(has("sensor","분산형 레이더") || has("sensor","Multistatic") || has("sensor","MIMO")){
+    prompt += `여러 USV의 레이더가 독립적으로 존재하는 것이 아니라, Cooperative / Distributed Radar 개념으로 상호 연계되는 모습을 표현한다.
+레이더 노드 간 협동 탐지와 공유 추적이 가능한 분산형 센서 네트워크처럼 보이도록 구성한다.
+`;
+  }
+
+  prompt += `
+## 3. 네트워크 / 통신
+
+선택 네트워크:
+${listBlock(networks)}
+
+수상 플랫폼 간에는 데이터링크와 해양 Mesh Network를 표현하고,
+수중 플랫폼 간에는 수중 음향통신 링크를 표현한다.
+SATCOM이 선택된 경우 중앙 플랫폼과 위성 간 장거리 통신 링크를 추가한다.
+플랫폼 간 연결은 얇고 정교한 시스템 네트워크 라인으로 표현한다.
+
+## 4. AI / CMS / 자율화
+
+선택 기능:
+${listBlock(ai)}
+
+AI Sensor Fusion은 이기종 센서 정보를 통합하여 Common Operational Picture를 형성하는 중앙 기능으로 표현한다.
+CMS는 통합된 상황정보를 각 플랫폼과 임무체계로 분배하는 지휘통제 허브로 표현한다.
+Autonomous Mission Management가 선택된 경우 임무 재할당, 협동 운용 및 자율 임무 수행을 시각적으로 암시한다.
+
+## 5. 정보 흐름
+
+선택 흐름:
+${listBlock(flows)}
+
+정보 흐름은 센서 데이터, 지휘통제 정보, 임무 데이터를 서로 구분 가능한 선 또는 화살표로 표현한다.
+`;
+
+  if(includeArchitecture){
+    prompt += `
+전체 시스템 계층은 다음 흐름이 읽히도록 구성한다.
+
+Sensor
+→ Communication Network
+→ AI Sensor Fusion
+→ Common Operational Picture
+→ CMS / Command & Control
+→ Autonomous Mission Management
+→ USV / UUV / XLUUV / Submarine / Mothership
+
+`;
+  }
+
+  prompt += `## 6. Systems Engineering 관점
+
+강조 요소:
+${listBlock(se)}
+
+플랫폼 자체의 외형보다 서브시스템 간 관계, 인터페이스, 데이터 흐름, 지휘통제 구조를 우선적으로 보여준다.
+시스템 아키텍처와 실제 해양 플랫폼 렌더링이 자연스럽게 결합된 형태로 표현한다.
+${englishNote}
+
+## 7. 시각적 스타일
+
+선택 스타일:
+${listBlock(styles)}
+
+현실적인 해양 환경, 정확한 크기 관계, 자연광, 절제된 해무와 반사,
+해군 회색(Naval Gray), 짙은 남색(Dark Navy), Charcoal, Muted Blue-Gray 계열을 사용한다.
+수중은 수면 근처의 청록색에서 깊은 수심의 짙은 남색으로 자연스럽게 변화시킨다.
+
+${hudText(hud)}
+
+`;
+
+  if(purpose === "cover"){
+    prompt += `발표 제목을 배치할 수 있도록 화면 상단 또는 좌측에 충분한 여백을 확보하고,
+주요 플랫폼은 중앙과 우측에 집중 배치한다.
+복잡한 전투 장면보다 체계의 통합성과 전문적인 방산 기술 발표자료의 표지 완성도를 우선한다.
+
+`;
+  } else if(purpose === "architecture"){
+    prompt += `영화적인 연출보다 시스템 구조의 명확성을 우선하며,
+각 서브시스템 간 인터페이스, 정보 흐름, 센서 데이터 흐름, 지휘통제 관계,
+플랫폼 간 네트워크를 한눈에 이해할 수 있도록 표현한다.
+실사형 3D 렌더링과 Systems Engineering Architecture Diagram의 중간 형태를 지향한다.
+
+`;
+  } else if(purpose === "photoreal"){
+    prompt += `실제 다국적 해군 기술시연 현장에서 촬영된 사진처럼 표현한다.
+현실적인 카메라 원근법, 플랫폼 간 물리적으로 정확한 크기 관계, 자연스러운 대기 원근감,
+현실적인 바다 물보라, 절제된 피사계 심도와 방산 기술 문서용 사진 스타일을 적용한다.
+HUD와 디지털 오버레이는 실사 이미지 위에 후처리로 추가된 그래픽처럼 표현한다.
+
+`;
+  }
+
+  if(extra){
+    prompt += `## 8. 추가 요구사항
+
+${extra}
+
+`;
+  }
+
+  prompt += `## 9. 제외 요소 / Negative Prompt
+
+- SF 우주선 스타일
+- 네온 / 사이버펑크
+- 과도한 홀로그램
+- 비현실적인 추진장치
+- 과도하게 큰 무장
+- 미사일 발사
+- 폭발
+- 전투 장면
+- 영화 포스터식 과장된 구도
+- 발광하는 선체
+- 복잡하고 과밀한 HUD
+- 기업 / 제조사 로고
+`;
+
+  if(extraNegative){
+    prompt += `- ${extraNegative.split("\n").join("\n- ")}\n`;
+  }
+
+  prompt += `
+가장 중요한 표현 목표는
+“미래형 무기체계의 화려함”이 아니라
+“센서 → 네트워크 → AI 센서융합 → CMS → 자율 임무관리 → 유·무인 플랫폼”
+으로 이어지는 차세대 해양 System-of-Systems 아키텍처를
+SE 관점에서 명확하게 보여주는 것이다.
+`;
+
+  $("#result").value = prompt;
+  $("#metric").textContent = `${prompt.length.toLocaleString()}자 · 약 ${Math.ceil(prompt.length/4).toLocaleString()} 토큰 상당`;
+}
+
+function setGroup(group, checkedValues){
+  $$(`[data-group="${group}"] input`).forEach(el => {
+    el.checked = checkedValues === "ALL" ? true : checkedValues.some(v => el.value.includes(v));
+  });
+}
+
+const presets = {
+  balanced(){
+    $$('input[type="checkbox"]').forEach(x => x.checked = false);
+    setGroup("platform",["대형 해양","유인 잠수함","XLUUV","USV","UUV"]);
+    setGroup("sensor",["AESA","EO/IR","ESM","소나"]);
+    setGroup("network",["Line-of-Sight","Maritime Mesh","SATCOM","Underwater Acoustic"]);
+    setGroup("ai",["AI Sensor Fusion","Common Operational","CMS","Autonomous Mission","Cooperative Autonomy"]);
+    setGroup("radar",["해상 표적","저고도","소형 RCS","Sea Clutter"]);
+    setGroup("se",["System-of-Systems","시스템 아키텍처","인터페이스","System Integration"]);
+    setGroup("flow",["Sensor Data","Command and Control","Mission Data"]);
+    setGroup("style",["Physically Plausible","Operationally Credible","Realistic Naval Engineering","Engineering Documentary","Restrained"]);
+    $("#purpose").value = "presentation";
+  },
+  radar(){
+    presets.balanced();
+    setGroup("sensor",["AESA","EO/IR","ESM","분산형 레이더","Multistatic","Cognitive"]);
+    setGroup("radar","ALL");
+    $("#title").value = "소형 AESA 및 분산형 레이더 기반 차세대 해양 무인전투체계";
+  },
+  autonomy(){
+    presets.balanced();
+    setGroup("ai","ALL");
+    setGroup("network","ALL");
+    setGroup("flow","ALL");
+    $("#title").value = "AI·군집 자율화 기반 해양 유·무인 복합전투체계";
+  },
+  underwater(){
+    presets.balanced();
+    setGroup("platform",["유인 잠수함","XLUUV","UUV","대형 해양"]);
+    setGroup("sensor",["소나","ESM"]);
+    setGroup("network",["Underwater Acoustic","SATCOM"]);
+    $("#composition").value = "underwater";
+    $("#title").value = "잠수함·XLUUV·UUV 통합 수중 System-of-Systems";
+  },
+  cover(){
+    presets.balanced();
+    $("#purpose").value = "cover";
+    $("#hud").value = "minimal";
+    $("#title").value = "차세대 해양 유·무인 복합전투체계";
+  }
+};
+
+$("#btnGenerate").addEventListener("click", generatePrompt);
+$("#btnCopy").addEventListener("click", async () => {
+  if(!$("#result").value) generatePrompt();
+  await navigator.clipboard.writeText($("#result").value);
+  const old = $("#btnCopy").textContent;
+  $("#btnCopy").textContent = "복사 완료";
+  setTimeout(()=>$("#btnCopy").textContent=old,1200);
+});
+$("#btnDownload").addEventListener("click", () => {
+  if(!$("#result").value) generatePrompt();
+  const blob = new Blob([$("#result").value], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "maritime_system_prompt.txt";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+$("#btnClear").addEventListener("click", () => {
+  $$('input[type="checkbox"]').forEach(x => x.checked = false);
+  $("#extra").value = "";
+  $("#extraNegative").value = "";
+  $("#result").value = "";
+  $("#metric").textContent = "";
+});
+$("#btnAll").addEventListener("click", () => {
+  presets.balanced();
+  generatePrompt();
+});
+$("#toggleAdvanced").addEventListener("click", () => {
+  $("#advanced").classList.toggle("show");
+  $("#toggleAdvanced").textContent = $("#advanced").classList.contains("show") ? "고급 옵션 닫기" : "고급 옵션 열기";
+});
+$$("[data-preset]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    presets[btn.dataset.preset]();
+    generatePrompt();
+  });
+});
+$$("input,select,textarea").forEach(el => {
+  el.addEventListener("change", generatePrompt);
+});
+$("#extra").addEventListener("input", generatePrompt);
+$("#extraNegative").addEventListener("input", generatePrompt);
+$("#title").addEventListener("input", generatePrompt);
+
+presets.balanced();
+generatePrompt();
+</script>
+</body>
+</html>
